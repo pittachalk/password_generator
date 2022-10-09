@@ -13,12 +13,12 @@ where x: random uppercase and lowercase characters or digits
 
 To run the script:
 ```sh
-python pwd_generator.py
+python generate_random_password.py
 ```
 
 To see additional arguments and options:
 ```sh
-python3 pwd_generator.py -h
+python3 generate_random_password.py -h
 ```
 
 Requires at least Python 3.5 (needed for `argparse`). 
