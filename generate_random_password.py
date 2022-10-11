@@ -13,6 +13,7 @@ Usage:
 """
 
 import sys
+import math
 import random
 import string
 import argparse
@@ -21,10 +22,10 @@ def cmdline_args():
     p = argparse.ArgumentParser(description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    p.add_argument("-l", "--length", type=int_range(5,20), default=6, help="length of individual phrases")
+    p.add_argument("-l", "--length", type=int_range(5,25), default=6, help="length of individual phrases")
     p.add_argument("-n", "--number", type=int_range(1,3), default=3, help="number of phrases")
     p.add_argument("-s", "--sep", type=str, default='-', help="separator")
-    p.add_argument("-a", "--exclude_ambiguous", type=bool, default=True, help="exclude the ambiguous characters lL1oO0")
+    p.add_argument("-a", "--exclude_ambiguous", type=bool, default=True, help="exclude the ambiguous characters iIlL1oO0")
     return(p.parse_args())
 
 
@@ -56,17 +57,31 @@ if __name__ == '__main__':
 
     args = cmdline_args()
 
+    # calculate length of the password excluding sep characters
+    password_length = args.length * args.number
+
     # possible characters to use for the password
-    population = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
+    population_unit = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
 
     if args.exclude_ambiguous:
-        for char in "ilL1oO0":
-            population.remove(char)
+        for char in "iIlL1oO0":
+            population_unit.remove(char)
+
+    # multiply the size of the population of characters if needed
+    mult_factor = math.ceil(password_length / len(population_unit))
+    population = []
+    for i in range(mult_factor):
+        population = population + population_unit
+    print(len(population))
+
+    # sample characters
+    sampled_chars = random.sample(population, password_length)
 
     phrases = []
     for i in range(args.number):
-        sampled_chars = random.sample(population, args.length)
-        phrase = ''.join(sampled_chars)
+        m = i * args.length
+        n = (i + 1) * args.length
+        phrase = ''.join(sampled_chars[m:n])
         phrases.append(phrase)
 
     password = args.sep.join(phrases)
