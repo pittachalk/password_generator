@@ -21,13 +21,32 @@ def cmdline_args():
     p = argparse.ArgumentParser(description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    p.add_argument("-l", "--length", type=int, default=6, help="length of individual phrases")
-    p.add_argument("-n", "--number", type=int, default=3, help="number of phrases")
+    p.add_argument("-l", "--length", type=int_range(5,20), default=6, help="length of individual phrases")
+    p.add_argument("-n", "--number", type=int_range(1,3), default=3, help="number of phrases")
     p.add_argument("-s", "--sep", type=str, default='-', help="separator")
     p.add_argument("-a", "--exclude_ambiguous", type=bool, default=True, help="exclude the ambiguous characters lL1oO0")
-
     return(p.parse_args())
 
+
+def int_range(mini,maxi):
+    """Return function handle of an argument type function for 
+       ArgumentParser checking a float range: mini <= arg <= maxi
+         mini - minimum acceptable argument
+         maxi - maximum acceptable argument"""
+
+    # Define the function with default arguments
+    def int_range_checker(arg):
+        """New Type function for argparse - a float within predefined range."""
+        try:
+            f = int(arg)
+        except ValueError:    
+            raise argparse.ArgumentTypeError("must be an integer number")
+        if f < mini or f > maxi:
+            raise argparse.ArgumentTypeError("must be in range [" + str(mini) + " .. " + str(maxi)+"]")
+        return f
+
+    # Return function handle to checking function
+    return int_range_checker
 
 if __name__ == '__main__':
     
