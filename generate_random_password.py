@@ -63,6 +63,7 @@ if __name__ == '__main__':
     # possible characters to use for the password
     population_unit = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
 
+    # drop ambigious characters if user requested
     if args.exclude_ambiguous:
         for char in "iIlL1oO0":
             population_unit.remove(char)
@@ -77,6 +78,7 @@ if __name__ == '__main__':
     # sample characters
     sampled_chars = random.sample(population, password_length)
 
+    # group characters into phrases 
     phrases = []
     for i in range(args.number):
         m = i * args.length
@@ -84,5 +86,7 @@ if __name__ == '__main__':
         phrase = ''.join(sampled_chars[m:n])
         phrases.append(phrase)
 
+    # join phrases using the sep character
     password = args.sep.join(phrases)
+
     print(password)
