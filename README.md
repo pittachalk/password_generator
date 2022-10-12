@@ -21,5 +21,5 @@ To see additional arguments and options:
 python3 generate_random_password.py -h
 ```
 
-Requires at least Python 3.5 (needed for `argparse`). 
+Requires at least Python 3.6 (needed for `argparse` and `random.choice` functions). 
 The script uses entirely built-in modules in Python, so should not require any additional libraries.
