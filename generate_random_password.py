@@ -27,6 +27,7 @@ def cmdline_args():
     p.add_argument("-s", "--sep", type=str, default='-', help="separator")
     p.add_argument("-a", "--exclude_ambiguous", type=bool, default=True, help="exclude the ambiguous characters iIlL1oO0")
     p.add_argument("-u", "--uppercase_prop", type=float_range(0,1), default=0.1, help="proportion of upper case characters")
+    p.add_argument("-d", "--digit_prop", type=float_range(0,1), default=0.1, help="proportion of digits")
 
     return(p.parse_args())
 
@@ -79,37 +80,46 @@ if __name__ == '__main__':
 
     args = cmdline_args()
 
+    # check that the uppercase and digit proportions to not sum up to above 1
+    if (args.uppercase_prop + args.digit_prop) > 1:
+        raise ValueError("Digit and upper case proportions cannot exceed 1 in total!")
+
     # calculate length of the password excluding sep characters
     password_length = args.length * args.number
 
     # number of characters of each type
-    num_uppercase = math.ceil(password_length * args.uppercase_prop) # guaranteed >=1 if args.upper_prop > 0
-    num_nonuppercase = password_length - num_uppercase
+    num_uppercase = math.ceil(password_length * args.uppercase_prop)
+    num_digit = math.ceil(password_length * args.digit_prop)
+    num_lowercase = password_length - num_uppercase - num_digit
 
     # possible characters to use for the password
     # population = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
-    population_nonuppercase = list(string.ascii_lowercase + string.digits)
+    population_lowercase = list(string.ascii_lowercase)
     population_uppercase = list(string.ascii_uppercase)
+    population_digit = list(string.digits)
 
     # drop ambiguous characters if user requested
     # based on https://stackoverflow.com/questions/4915920/how-to-delete-an-item-in-a-list-if-it-exists
-    if args.exclude_ambiguous:
+    if args.exclude_ambiguous == False:
         for char in "iIlL1oO0":
             try:
-                population_nonuppercase.remove(char)
+                population_lowercase.remove(char)
             except ValueError:
-                pass
-            try:
-                population_uppercase.remove(char)
-            except ValueError:
-                pass
+                try:
+                    population_uppercase.remove(char)
+                except ValueError:
+                    try:
+                        population_digit.remove(char)
+                    except ValueError:
+                        pass
 
     # sample characters with replacement
-    sampled_nonuppercase = random.choices(population_nonuppercase, k=num_nonuppercase)
+    sampled_lowercase = random.choices(population_lowercase, k=num_lowercase)
     sampled_uppercase = random.choices(population_uppercase, k=num_uppercase)
+    sampled_digit = random.choices(population_digit, k=num_digit)
 
     # join these lists, then shuffle the order
-    sampled_chars = sampled_nonuppercase + sampled_uppercase
+    sampled_chars = sampled_lowercase + sampled_uppercase + sampled_digit
     sampled_chars = random.sample(sampled_chars, len(sampled_chars))
 
     # group characters into phrases 
