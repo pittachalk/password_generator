@@ -25,9 +25,11 @@ def cmdline_args():
     p.add_argument("-l", "--length", type=int_range(5,25), default=6, help="length of individual phrases")
     p.add_argument("-n", "--number", type=int_range(1,3), default=3, help="number of phrases")
     p.add_argument("-s", "--sep", type=str, default='-', help="separator")
-    p.add_argument("-a", "--exclude_ambiguous", type=bool, default=True, help="exclude the ambiguous characters iIlL1oO0")
     p.add_argument("-u", "--uppercase_prop", type=float_range(0,1), default=0.1, help="proportion of upper case characters")
     p.add_argument("-d", "--digit_prop", type=float_range(0,1), default=0.1, help="proportion of digits")
+    
+    # https://stackoverflow.com/questions/44561722/why-in-argparse-a-true-is-always-true
+    p.add_argument('--exclude_ambiguous', default='', action='store_false', help='exclude the ambiguous characters iIlL1oO0')
 
     return(p.parse_args())
 
