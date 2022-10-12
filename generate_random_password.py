@@ -26,6 +26,7 @@ def cmdline_args():
     p.add_argument("-n", "--number", type=int_range(1,3), default=3, help="number of phrases")
     p.add_argument("-s", "--sep", type=str, default='-', help="separator")
     p.add_argument("-a", "--exclude_ambiguous", type=bool, default=True, help="exclude the ambiguous characters iIlL1oO0")
+
     return(p.parse_args())
 
 
@@ -51,8 +52,8 @@ def int_range(mini,maxi):
 
 if __name__ == '__main__':
     
-    if sys.version_info<(3,5,0):
-        sys.stderr.write("You need python 3.5 or later to run this script\n")
+    if sys.version_info<(3,6,0):
+        sys.stderr.write("You need python 3.6 or later to run this script\n")
         sys.exit(1)
 
     args = cmdline_args()
@@ -61,22 +62,15 @@ if __name__ == '__main__':
     password_length = args.length * args.number
 
     # possible characters to use for the password
-    population_unit = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
+    population = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
 
     # drop ambigious characters if user requested
     if args.exclude_ambiguous:
         for char in "iIlL1oO0":
-            population_unit.remove(char)
+            population.remove(char)
 
-    # multiply the size of the population of characters if needed
-    mult_factor = math.ceil(password_length / len(population_unit))
-    population = []
-    for i in range(mult_factor):
-        population = population + population_unit
-    print(len(population))
-
-    # sample characters
-    sampled_chars = random.sample(population, password_length)
+    # sample characters with replacement
+    sampled_chars = random.choices(population, k=password_length)
 
     # group characters into phrases 
     phrases = []
