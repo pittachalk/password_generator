@@ -6,9 +6,19 @@ Generate a random password in the style of the Apple iCloud Keychain.
 
 where x: random uppercase and lowercase characters or digits
 
-Usage:
-    $ python /path/to/script.py
+Usage recipes:
+    
+    # default
+    python3 generate_random_password.py
 
+    # default but exclude the ambiguous characters "iIlL1oO0"
+    python3 generate_random_password.py --exclude_ambiguous
+
+    # 10 character continuous password (e.g. Hahahahah8)
+    python3 generate_random_password.py -l 10 -n 1
+
+    # 8 digit PIN code (e.g. 88888888)
+    python3 generate_random_password.py -l 8 -n 1 -u 0 -d 1
 
 """
 
@@ -22,14 +32,20 @@ def cmdline_args():
     p = argparse.ArgumentParser(description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    p.add_argument("-l", "--length", type=int_range(5,25), default=6, help="length of individual phrases")
-    p.add_argument("-n", "--number", type=int_range(1,3), default=3, help="number of phrases")
-    p.add_argument("-s", "--sep", type=str, default='-', help="separator")
-    p.add_argument("-u", "--uppercase_prop", type=float_range(0,1), default=0.1, help="proportion of upper case characters")
-    p.add_argument("-d", "--digit_prop", type=float_range(0,1), default=0.1, help="proportion of digits")
+    # main arguments about length and structure of password
+    p.add_argument("-l", "--length", type=int_range(4,25), default=6, help="Length of individual phrases. Default: 6. Allowed: [4 .. 25]")
+    p.add_argument("-n", "--number", type=int_range(1,3), default=3, help="Number of phrases. Default: 3. Allowed: [1 .. 3]")
+    p.add_argument("-s", "--sep", type=str, default='-', help="Character to separate phrases. Default: -")
+
+    # controls proportions of character types
+    p.add_argument("-u", "--uppercase_prop", 
+        type=float_range(0,1), default=0.1, help="Proportion of upper case characters. Default: 0.1. Allowed: [0 .. 1]")
+    p.add_argument("-d", "--digit_prop",
+        type=float_range(0,1), default=0.1, help="Proportion of digits. Default: 0.1. Allowed: [0 .. 1]")
     
     # https://stackoverflow.com/questions/44561722/why-in-argparse-a-true-is-always-true
-    p.add_argument('--exclude_ambiguous', default='', action='store_false', help='exclude the ambiguous characters iIlL1oO0')
+    p.add_argument('--exclude_ambiguous', default='', action='store_false', 
+        help='Pass this to exclude the ambiguous characters iIlL1oO0. Default behaviour is to include them.')
 
     return(p.parse_args())
 
