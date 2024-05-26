@@ -8,11 +8,11 @@ where x: random uppercase and lowercase characters or digits
 
 Usage recipes:
     
-    # default
+    # default, where some ambiguous characters "IlO0" are excluded for readability
     python3 generate_random_password.py
 
-    # default but exclude the ambiguous characters "iIlL1oO0"
-    python3 generate_random_password.py --exclude_ambiguous
+    # if you wish to keep all characters to maximise randomness
+    python3 generate_random_password.py --include_ambiguous
 
     # 10 character continuous password (e.g. Hahahahah8)
     python3 generate_random_password.py -l 10 -n 1
@@ -41,11 +41,11 @@ def cmdline_args():
     p.add_argument("-u", "--uppercase_prop", 
         type=float_range(0,1), default=0.1, help="Proportion of upper case characters. Default: 0.1. Allowed: [0 .. 1]")
     p.add_argument("-d", "--digit_prop",
-        type=float_range(0,1), default=0.1, help="Proportion of digits. Default: 0.1. Allowed: [0 .. 1]")
+        type=float_range(0,1), default=0.15, help="Proportion of digits. Default: 0.15. Allowed: [0 .. 1]")
     
     # https://stackoverflow.com/questions/44561722/why-in-argparse-a-true-is-always-true
-    p.add_argument('--exclude_ambiguous', default='', action='store_false', 
-        help='Pass this to exclude the ambiguous characters iIlL1oO0. Default behaviour is to include them.')
+    p.add_argument('--include_ambiguous', default=False, action='store_true', 
+        help='Pass this to not exclude certain characters ("IlO0" from iIlL1oO0) to reduce ambiguity. Default behaviour is to exclude them.')
 
     return(p.parse_args())
 
@@ -116,10 +116,10 @@ if __name__ == '__main__':
     population_uppercase = list(string.ascii_uppercase)
     population_digit = list(string.digits)
 
-    # drop ambiguous characters if user requested
+    # keep ambiguous characters if user requested
     # based on https://stackoverflow.com/questions/4915920/how-to-delete-an-item-in-a-list-if-it-exists
-    if args.exclude_ambiguous == False:
-        for char in "iIlL1oO0":
+    if args.include_ambiguous == False:
+        for char in "IlO0": # full set: iIlL1oO0
             try:
                 population_lowercase.remove(char)
             except ValueError:
